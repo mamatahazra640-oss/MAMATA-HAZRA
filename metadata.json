@@ -1,0 +1,6 @@
+{
+  "name": "SD Trading Learning",
+  "description": "সম্পূর্ণ বাংলা ভাষায় শেয়ার মার্কেট ও ট্রেডিং শিক্ষার আধুনিক লার্নিং প্ল্যাটফর্ম ও মোবাইল অ্যাপ",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
