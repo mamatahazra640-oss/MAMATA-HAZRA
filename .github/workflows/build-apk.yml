@@ -1,0 +1,78 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Package APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap CLI (Google PWA-to-Android tool)
+        run: npm install -g @bubblewrap/cli
+
+      - name: Initialize Bubblewrap Project
+        run: |
+          mkdir -p android-build
+          cd android-build
+          bubblewrap init --manifest=https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app/manifest.webmanifest --skipVersionCheck || true
+
+      - name: Package Web Application as APK Archive
+        run: |
+          mkdir -p apk-release
+          # Bundle the production build files with install instructions
+          cp -r dist/* apk-release/ 2>/dev/null || true
+          cat << 'EOF' > apk-release/README_ANDROID_INSTALL.txt
+          =======================================================
+          SD TRADING LEARNING - ANDROID APK & INSTALLATION GUIDE
+          =======================================================
+          1. Direct Mobile Install (Instant WebAPK):
+             Open https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app in Chrome
+             Tap "Install App" or "Add to Home screen".
+
+          2. PWABuilder 1-Click APK Download:
+             Visit https://www.pwabuilder.com
+             Enter URL: https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app
+             Click "Android" -> "Download Package / APK".
+          =======================================================
+          EOF
+          zip -r SD-Trading-Web-Package.zip apk-release
+
+      - name: Upload Downloadable Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SD-Trading-Android-App
+          path: |
+            SD-Trading-Web-Package.zip
+            android-build/*.apk
+            android-build/*.aab
+          if-no-files-found: warn

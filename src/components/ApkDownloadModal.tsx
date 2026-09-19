@@ -13,13 +13,15 @@ interface ApkDownloadModalProps {
 export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) => {
   const { isInstallable, isInstalled, isIOS, isAndroid, install } = usePWAInstall();
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'pwa' | 'apk'>('pwa');
+  const [activeTab, setActiveTab] = useState<'direct-apk' | 'webapk' | 'github'>('direct-apk');
 
   // App URLs
   const currentAppUrl = window.location.href.split('?')[0].replace(/\/$/, '');
   const shareableUrl = currentAppUrl.includes('run.app') 
     ? currentAppUrl 
     : 'https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app';
+
+  const pwabuilderUrl = `https://www.pwabuilder.com/?url=${encodeURIComponent(shareableUrl)}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareableUrl);
@@ -55,47 +57,114 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
             </div>
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/30 px-2 py-0.5 rounded-full text-emerald-200 border border-emerald-400/30">
-                অ্যান্ড্রয়েড ও মোবাইল গাইড
+                অ্যান্ড্রয়েড ইনস্টল ও APK সেন্টার
               </span>
               <h2 className="text-lg sm:text-xl font-extrabold tracking-tight">
-                মোবাইলে SD Trading অ্যাপ / APK ইনস্টল করুন
+                SD Trading অ্যান্ড্রয়েড APK ডাউনলোড ও ইনস্টল
               </h2>
             </div>
           </div>
           <p className="text-xs text-emerald-100/90 leading-relaxed max-w-xl">
-            আপনার অ্যান্ড্রয়েড বা আইফোনে সরাসরি আসল অ্যাপ হিসেবে ইনস্টল করুন। কোনো থার্ড-পার্টি ক্ষতিকর সাইটে না গিয়ে সরাসরি নিরাপদ ও দ্রুত উপায়ে ফোনে পান।
+            আপনার অ্যান্ড্রয়েড ফোনে সরাসরি .APK ফাইল ডাউনলোড করতে অথবা কোনো ঝামেলা ছাড়াই ১-ক্লিকে আসল অ্যাপ হিসেবে ইনস্টল করতে নিচের পদ্ধতিগুলো ব্যবহার করুন।
           </p>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 px-4 pt-2">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 px-2 sm:px-4 pt-2 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('pwa')}
-            className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'pwa'
+            onClick={() => setActiveTab('direct-apk')}
+            className={`pb-3 px-3 sm:px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'direct-apk'
+                ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+            }`}
+          >
+            <Download className="w-4 h-4" />
+            <span>সরাসরি .APK ডাউনলোড (PWABuilder)</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('webapk')}
+            className={`pb-3 px-3 sm:px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'webapk'
                 ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
             }`}
           >
             <Zap className="w-4 h-4" />
-            <span>১-ক্লিকে ইনস্টল (WebAPK) - প্রস্তাবিত</span>
+            <span>ফোনে ১-ক্লিকে ইনস্টল (Chrome)</span>
           </button>
           <button
-            onClick={() => setActiveTab('apk')}
-            className={`pb-3 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'apk'
+            onClick={() => setActiveTab('github')}
+            className={`pb-3 px-3 sm:px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'github'
                 ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
             }`}
           >
             <Terminal className="w-4 h-4" />
-            <span>স্ট্যান্ডঅ্যালোন .APK ফাইল বিল্ড (Developers)</span>
+            <span>GitHub Actions সমাধান</span>
           </button>
         </div>
 
         {/* Content Area */}
         <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-          {activeTab === 'pwa' ? (
+          {activeTab === 'direct-apk' && (
+            <div className="space-y-4">
+              {/* Highlight Card for 1-Click APK */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30 border-2 border-emerald-500/40 space-y-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-600/30">
+                    <Download className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white inline-block mb-1">
+                      ১-ক্লিকে সরাসরি APK ফাইল
+                    </span>
+                    <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                      অ্যান্ড্রয়েড Standalone APK ফাইল ডাউনলোড করুন
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                      মাইক্রোসফটের অফিশিয়াল <strong>PWABuilder</strong> ক্লাউড ইঞ্জিনের মাধ্যমে কোনো কোডিং বা সফটওয়্যার ছাড়াই এই অ্যাপের রেডি-টু-ইনস্টল <strong>.apk</strong> ফাইল ডাউনলোড করতে নিচের বাটনে চাপ দিন:
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-1 flex flex-col sm:flex-row gap-2.5">
+                  <a
+                    href={pwabuilderUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-900/30 transition flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>PWABuilder-এ APK ডাউনলোড পেজ খুলুন</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+
+                  <button
+                    onClick={handleCopyLink}
+                    className="py-3 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center justify-center gap-2"
+                  >
+                    {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    <span>{copied ? 'অ্যাপ লিঙ্ক কপি হয়েছে' : 'অ্যাপ লিঙ্ক কপি'}</span>
+                  </button>
+                </div>
+
+                <div className="p-3 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
+                  <p className="font-bold text-slate-800 dark:text-slate-200">
+                    PWABuilder-এ যেভাবে APK ফাইলটি পাবেন:
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 pl-1">
+                    <li>উপরের সবুজ বাটনে চাপ দিলে পেজটি ওপেন হবে এবং এই অ্যাপের লিঙ্কটি স্বয়ংক্রিয়ভাবে ইনপুট হয়ে যাবে।</li>
+                    <li>পেজে <strong>"Package for Stores"</strong> এ ক্লিক করে <strong>"Android"</strong> সিলেক্ট করুন।</li>
+                    <li><strong>"Generate APK / Package"</strong> বাটনে ক্লিক করলেই আপনার ফোনে সাথে সাথে সম্পূর্ণ <strong>.apk</strong> ফাইল ডাউনলোড হয়ে যাবে!</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'webapk' && (
             <div className="space-y-5">
               {/* If browser supports direct prompt */}
               {isInstallable && (
@@ -166,7 +235,7 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    এই লিঙ্কটি মোবাইলের <strong>Google Chrome</strong> ব্রাউজারে পাঠাতে পারেন (যেমন হোয়াটসঅ্যাপে বা ব্রাউজারে লিখে)।
+                    এই লিঙ্কটি মোবাইলের <strong>Google Chrome</strong> ব্রাউজারে খুলুন।
                   </p>
                 </div>
               </div>
@@ -175,7 +244,7 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
               <div className="space-y-3">
                 <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
                   <Smartphone className="w-4 h-4 text-emerald-600" />
-                  <span>অ্যান্ড্রয়েড ফোনে ইনস্টল করার সহজ ৩টি ধাপ:</span>
+                  <span>অ্যান্ড্রয়েড ফোনে সরাসরি ইনস্টল করার সহজ ৩টি ধাপ:</span>
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -210,62 +279,30 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
                   </div>
                 </div>
               </div>
-
-              {/* Benefits of WebAPK */}
-              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-200 text-xs space-y-1">
-                <div className="font-bold flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  <span>কেন এটি সাধারণ APK ফাইলের চেয়ে বেশি নিরাপদ?</span>
-                </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  গুগলের অফিসিয়াল WebAPK টেকনোলজি নিশ্চিত করে যে আপনার ফোনে কোনো ভাইরাস বা ম্যালওয়্যার ঢুকবে না। অ্যাপটি স্বয়ংক্রিয়ভাবে আপডেট পাবে এবং কোনো অতিরিক্ত মেমোরি খরচ না করে অফলাইনেও চলবে।
-                </p>
-              </div>
             </div>
-          ) : (
+          )}
+
+          {activeTab === 'github' && (
             <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-emerald-600" />
-                  <span>গুগল বাবলর‍্যাপ (Google Bubblewrap) দিয়ে ১-মিনিটে সরাসরি .APK ও .AAB তৈরি:</span>
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                  গুগল তাদের ক্রোম ও অ্যান্ড্রয়েড টিমের মাধ্যমে <strong>Bubblewrap</strong> নামক অফিসিয়াল টুল সরবরাহ করে, যা যেকোনো PWA অ্যাপকে সরাসরি Google Play Store উপযোগী সাইন্ড <strong>.APK</strong> ও <strong>.AAB (Android App Bundle)</strong> ফাইলে রূপান্তর করে:
-                </p>
-
-                <div className="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-[11px] space-y-1.5 overflow-x-auto">
-                  <div className="text-slate-500"># ১. Google Bubblewrap CLI ইনস্টল করুন:</div>
-                  <div>npm install -g @bubblewrap/cli</div>
-                  <div className="text-slate-500 pt-1"># ২. এই অ্যাপের ম্যানিফেস্ট দিয়ে প্রজেক্ট ইনিশিয়ালাইজ করুন:</div>
-                  <div>bubblewrap init --manifest={shareableUrl}/manifest.webmanifest</div>
-                  <div className="text-slate-500 pt-1"># ৩. সরাসরি APK বিল্ড করুন:</div>
-                  <div>bubblewrap build</div>
-                </div>
-
-                <p className="text-slate-500 dark:text-slate-400 text-[11px]">
-                  ব্যাস! <code className="text-emerald-600 dark:text-emerald-400 font-mono">app-release-signed.apk</code> ফাইল তৈরি হয়ে যাবে যা আপনি যেকোনো অ্যান্ড্রয়েড মোবাইলে পেনড্রাইভ বা ব্লুটুথ দিয়ে দিয়ে ইনস্টল করতে পারবেন।
+              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-2">
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>স্ক্রিনশটে "Get started with GitHub Actions" কেন দেখাচ্ছিল?</span>
+                </h4>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
+                  গিটহাবে (GitHub) কোনো রিপোজিটরিতে স্বয়ংক্রিয়ভাবে APK ফাইল তৈরি করার জন্য একটি নির্দিষ্ট <strong>GitHub Actions Workflow ফাইল (.github/workflows/build-apk.yml)</strong> থাকা প্রয়োজন। যেহেতু এর আগে প্রজেক্টে এই ফাইলটি ছিল না, তাই গিটহাব কোনো বিল্ড খুঁজে না পেয়ে আপনাকে টেমপ্লেট সাজেস্ট করছিল।
                 </p>
               </div>
 
-              {/* Method 2: Android Studio / Capacitor */}
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-                <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-blue-600" />
-                  <span>পদ্ধতি ২: সোর্স কোড এক্সপোর্ট ও Android Studio (Capacitor):</span>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                  এখন আপনার যা করতে হবে (১ মিনিট):
                 </h4>
-                <ol className="list-decimal list-inside space-y-1.5 text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                  <li>AI Studio-র উপরের ডানদিকের সেটিংস ড্রপডাউন থেকে <strong>Export to ZIP</strong> বা <strong>Export to GitHub</strong> এ ক্লিক করুন।</li>
-                  <li>আপনার কম্পিউটারে ফোল্ডারটি ওপেন করে টার্মিনালে চালান:
-                    <code className="block mt-1 p-2 rounded bg-slate-900 text-emerald-400 font-mono text-[10px]">
-                      npm install<br />
-                      npm install @capacitor/core @capacitor/android<br />
-                      npx cap init "SD Trading" "com.sdtrading.learning"<br />
-                      npm run build<br />
-                      npx cap add android<br />
-                      npx cap open android
-                    </code>
-                  </li>
-                  <li>Android Studio খুললে <strong>Build &gt; Build Bundle(s) / APK(s) &gt; Build APK(s)</strong> চাপলেই তৈরি হয়ে যাবে আপনার সম্পূর্ণ নিজস্ব APK ফাইল!</li>
+                <ol className="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+                  <li>আমরা আপনার প্রজেক্টে স্বয়ংক্রিয় <strong>`.github/workflows/build-apk.yml`</strong> ফাইলটি যুক্ত করে দিয়েছি।</li>
+                  <li>AI Studio-র উপরের ডানদিকের <strong>Settings (সেটিংস)</strong> মেনু থেকে <strong>"Export to GitHub"</strong> এ আবার ক্লিক করে আপনার রিপোজিটরিতে পুশ করুন।</li>
+                  <li>এখন GitHub-এ গিয়ে <strong>Actions</strong> ট্যাবে রিফ্রেশ করলেই দেখতে পাবেন <strong>"Build & Package APK"</strong> স্বয়ংক্রিয়ভাবে চলতে শুরু করেছে।</li>
+                  <li>বিল্ডটি শেষ হলে সেটিতে ক্লিক করলে নিচে <strong>Artifacts</strong> সেকশনে সরাসরি <strong>SD-Trading-Android-App (.zip / .apk)</strong> ফাইল ডাউনলোড অপশন পেয়ে যাবেন!</li>
                 </ol>
               </div>
             </div>
