@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Smartphone, Download, QrCode, CheckCircle2, Copy, 
   ExternalLink, ArrowRight, ShieldCheck, Zap, X, Terminal, 
-  HelpCircle, Sparkles, Layers 
+  HelpCircle, Sparkles, Layers, Share2 
 } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 
@@ -17,14 +17,18 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
 
   // App URLs
   const currentAppUrl = window.location.href.split('?')[0].replace(/\/$/, '');
+  const devAppUrl = 'https://ais-dev-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app';
+  const sharedAppUrl = 'https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app';
+
   const shareableUrl = currentAppUrl.includes('run.app') 
     ? currentAppUrl 
-    : 'https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app';
+    : sharedAppUrl;
 
   const pwabuilderUrl = `https://www.pwabuilder.com/?url=${encodeURIComponent(shareableUrl)}`;
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareableUrl);
+  const handleCopyLink = (urlToCopy?: string) => {
+    const target = typeof urlToCopy === 'string' ? urlToCopy : shareableUrl;
+    navigator.clipboard.writeText(target);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -142,7 +146,7 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
                   </a>
 
                   <button
-                    onClick={handleCopyLink}
+                    onClick={() => handleCopyLink()}
                     className="py-3 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-bold transition flex items-center justify-center gap-2"
                   >
                     {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -159,6 +163,33 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
                     <li>পেজে <strong>"Package for Stores"</strong> এ ক্লিক করে <strong>"Android"</strong> সিলেক্ট করুন।</li>
                     <li><strong>"Generate APK / Package"</strong> বাটনে ক্লিক করলেই আপনার ফোনে সাথে সাথে সম্পূর্ণ <strong>.apk</strong> ফাইল ডাউনলোড হয়ে যাবে!</li>
                   </ol>
+                </div>
+
+                {/* Important Notice for "Page Not Found" */}
+                <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-300 dark:border-amber-700/60 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
+                  <p className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                    <HelpCircle className="w-4 h-4 text-amber-600" />
+                    <span>লিঙ্ক ওপেন করলে "Error: Page not found" দেখাচ্ছে?</span>
+                  </p>
+                  <p className="leading-relaxed">
+                    AI Studio-র নিয়ম অনুযায়ী, উপরে ডানদিকের <strong>"Share" (শেয়ার)</strong> বোতামে ক্লিক না করা পর্যন্ত ক্লাউড রান সার্ভারে প্রিভিউ লিঙ্কটি লাইভ হয় না। সমাধান:
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <button
+                      onClick={() => handleCopyLink(devAppUrl)}
+                      className="px-3 py-2 rounded-lg bg-amber-200/70 hover:bg-amber-200 dark:bg-amber-900/50 text-amber-950 dark:text-amber-200 font-bold transition flex items-center justify-center gap-1.5"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>লাইভ ডেভেলপমেন্ট লিঙ্ক কপি করুন</span>
+                    </button>
+                    <button
+                      onClick={() => handleCopyLink(sharedAppUrl)}
+                      className="px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 text-slate-800 dark:text-slate-200 font-bold transition flex items-center justify-center gap-1.5"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>পাবলিক শেয়ার লিঙ্ক কপি করুন</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -227,7 +258,7 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
                       className="flex-1 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 font-mono truncate select-all"
                     />
                     <button
-                      onClick={handleCopyLink}
+                      onClick={() => handleCopyLink()}
                       className="px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                       {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
