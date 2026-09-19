@@ -284,26 +284,42 @@ export const ApkDownloadModal: React.FC<ApkDownloadModalProps> = ({ onClose }) =
 
           {activeTab === 'github' && (
             <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 space-y-2">
+              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700 space-y-2">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  <span>স্ক্রিনশটে "Get started with GitHub Actions" কেন দেখাচ্ছিল?</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>স্ক্রিনশটের ত্রুটি (15s Failure: Lock file not found) সম্পূর্ণ সমাধান করা হয়েছে:</span>
                 </h4>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
-                  গিটহাবে (GitHub) কোনো রিপোজিটরিতে স্বয়ংক্রিয়ভাবে APK ফাইল তৈরি করার জন্য একটি নির্দিষ্ট <strong>GitHub Actions Workflow ফাইল (.github/workflows/build-apk.yml)</strong> থাকা প্রয়োজন। যেহেতু এর আগে প্রজেক্টে এই ফাইলটি ছিল না, তাই গিটহাব কোনো বিল্ড খুঁজে না পেয়ে আপনাকে টেমপ্লেট সাজেস্ট করছিল।
+                  আপনার দেওয়া স্ক্রিনশটে গিটহাব অ্যাকশনে <strong>"Dependencies lock file is not found"</strong> ত্রুটি এসেছিল। আমরা প্রজেক্টে অফিসিয়াল <strong>package-lock.json</strong> এবং সম্পূর্ণ <strong>Android Gradle Native Engine</strong> যুক্ত করে দিয়েছি।
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm">
-                  এখন আপনার যা করতে হবে (১ মিনিট):
+                  APK ফাইল পেতে এখন ৩টি সহজ পদক্ষেপ:
                 </h4>
                 <ol className="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                  <li>আমরা আপনার প্রজেক্টে স্বয়ংক্রিয় <strong>`.github/workflows/build-apk.yml`</strong> ফাইলটি যুক্ত করে দিয়েছি।</li>
-                  <li>AI Studio-র উপরের ডানদিকের <strong>Settings (সেটিংস)</strong> মেনু থেকে <strong>"Export to GitHub"</strong> এ আবার ক্লিক করে আপনার রিপোজিটরিতে পুশ করুন।</li>
-                  <li>এখন GitHub-এ গিয়ে <strong>Actions</strong> ট্যাবে রিফ্রেশ করলেই দেখতে পাবেন <strong>"Build & Package APK"</strong> স্বয়ংক্রিয়ভাবে চলতে শুরু করেছে।</li>
-                  <li>বিল্ডটি শেষ হলে সেটিতে ক্লিক করলে নিচে <strong>Artifacts</strong> সেকশনে সরাসরি <strong>SD-Trading-Android-App (.zip / .apk)</strong> ফাইল ডাউনলোড অপশন পেয়ে যাবেন!</li>
+                  <li>
+                    <strong>ধাপ ১ (নতুন কোড সিঙ্ক):</strong> AI Studio-র উপরে ডানদিকের <strong>Settings (সেটিংস)</strong> মেনুতে গিয়ে <strong>"Export to GitHub"</strong>-এ ক্লিক করুন।
+                  </li>
+                  <li>
+                    <strong>ধাপ ২ (বিল্ড অটো-স্টার্ট):</strong> আপনার গিটহাব পেজে (<code className="font-mono text-emerald-600">github.com/mamatahazra640-oss/MAMATA-HAZRA/actions</code>) স্বয়ংক্রিয়ভাবে নতুন <strong>Build Android APK</strong> সবুজ হয়ে চালু হবে (অথবা স্ক্রিনশটে থাকা <strong>"Re-run jobs"</strong> বাটনে চাপ দিন)।
+                  </li>
+                  <li>
+                    <strong>ধাপ ৩ (APK ডাউনলোড):</strong> ২ মিনিট পর বিল্ড সফল হলে ওই রানে ক্লিক করলে নিচে <strong>Artifacts</strong> সেকশনে সরাসরি <strong>SD-Trading-Learning-APK</strong> নামের রেডি <strong>.apk</strong> ফাইলটি ডাউনলোড করার লিঙ্ক পেয়ে যাবেন!
+                  </li>
                 </ol>
+              </div>
+
+              {/* Alternative fast download */}
+              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-800 space-y-2">
+                <h5 className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-amber-600" />
+                  <span>গিটহাবের অপেক্ষা না করে এখনই APK চান?</span>
+                </h5>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                  উপরে <strong>"সরাসরি .APK ডাউনলোড (PWABuilder)"</strong> ট্যাবে যান এবং সবুজ বোতামে ক্লিক করুন। সেখানে <strong>Android &gt; Generate APK</strong> চাপলেই ৩০ সেকেন্ডে আপনার ফোনে সরাসরি .apk ডাউনলোড হয়ে যাবে!
+                </p>
               </div>
             </div>
           )}

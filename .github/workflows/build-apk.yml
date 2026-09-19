@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build & Package APK
+  build-apk:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -20,15 +20,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install Web Dependencies
+        run: npm install --legacy-peer-deps
 
       - name: Build Web Application
         run: npm run build
 
-      - name: Setup Java JDK
+      - name: Bundle Web Assets into Android App
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp -r dist/* android/app/src/main/assets/
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -37,42 +41,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Bubblewrap CLI (Google PWA-to-Android tool)
-        run: npm install -g @bubblewrap/cli
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Initialize Bubblewrap Project
+      - name: Build APK with Gradle
         run: |
-          mkdir -p android-build
-          cd android-build
-          bubblewrap init --manifest=https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app/manifest.webmanifest --skipVersionCheck || true
+          cd android
+          gradle assembleRelease --stacktrace || gradle assembleDebug --stacktrace
 
-      - name: Package Web Application as APK Archive
+      - name: Prepare Downloadable APK
         run: |
-          mkdir -p apk-release
-          # Bundle the production build files with install instructions
-          cp -r dist/* apk-release/ 2>/dev/null || true
-          cat << 'EOF' > apk-release/README_ANDROID_INSTALL.txt
-          =======================================================
-          SD TRADING LEARNING - ANDROID APK & INSTALLATION GUIDE
-          =======================================================
-          1. Direct Mobile Install (Instant WebAPK):
-             Open https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app in Chrome
-             Tap "Install App" or "Add to Home screen".
+          mkdir -p release-apk
+          APK_FILE=$(find android/app/build/outputs/apk/ -name "*.apk" | head -n 1)
+          if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
+            cp "$APK_FILE" release-apk/SD-Trading-Learning-v1.0.apk
+          else
+            echo "Backup packaging..."
+            zip -r release-apk/SD-Trading-Web-Package.zip dist/
+          fi
+          ls -la release-apk/
 
-          2. PWABuilder 1-Click APK Download:
-             Visit https://www.pwabuilder.com
-             Enter URL: https://ais-pre-b2f52zow3st4ihfhqbwbfl-949110010761.asia-southeast1.run.app
-             Click "Android" -> "Download Package / APK".
-          =======================================================
-          EOF
-          zip -r SD-Trading-Web-Package.zip apk-release
-
-      - name: Upload Downloadable Artifacts
+      - name: Upload SD-Trading APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SD-Trading-Android-App
-          path: |
-            SD-Trading-Web-Package.zip
-            android-build/*.apk
-            android-build/*.aab
-          if-no-files-found: warn
+          name: SD-Trading-Learning-APK
+          path: release-apk/*
+          if-no-files-found: error

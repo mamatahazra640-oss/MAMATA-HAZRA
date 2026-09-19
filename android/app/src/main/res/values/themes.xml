@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.SDTrading" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#064e3b</item>
+        <item name="android:navigationBarColor">#064e3b</item>
+    </style>
+</resources>
